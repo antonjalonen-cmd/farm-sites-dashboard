@@ -66,7 +66,8 @@
     gap: 4px 10px; padding: 10px 0; border-bottom: 1px solid var(--border);
   }
   .time-label { font-size: 0.72rem; color: var(--muted); min-width: 38px; }
-  .row-name { font-weight: 700; font-size: 0.9rem; color: var(--ink); }
+  .row-name { font-weight: 700; font-size: 0.9rem; color: var(--ink); text-decoration: none; }
+  a.row-name:hover { color: var(--cyan); text-decoration: underline; }
   .dot {
     width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
     display: inline-block; margin-right: 2px;
@@ -158,12 +159,16 @@ function render(filter) {
 
     entries.forEach(s => {
       const sm = statusMeta[s.status];
+      const primaryUrl = s.gh ? `https://${s.gh}/` : (s.nf ? `https://${s.nf}/` : null);
+      const nameHtml = primaryUrl
+        ? `<a class="row-name" href="${primaryUrl}" target="_blank">${s.name}</a>`
+        : `<span class="row-name">${s.name}</span>`;
       const row = document.createElement('div');
       row.className = 'row';
       row.innerHTML = `
         <span class="time-label">${s.time || '—'}</span>
         <span class="dot ${s.status}"></span>
-        <span class="row-name">${s.name}</span>
+        ${nameHtml}
         <span class="status-label">${sm.label}</span>
         <span class="row-links">
           ${s.gh ? `<a href="https://${s.gh}/" target="_blank">${s.gh}</a>` : ''}
