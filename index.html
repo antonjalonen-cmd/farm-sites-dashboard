@@ -56,31 +56,8 @@
     pointer-events: none;
     z-index: 0;
   }
-  .scan {
-    position: fixed; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--cyan-glow), transparent);
-    box-shadow: 0 0 12px 2px var(--cyan-glow);
-    animation: sweep 6s linear infinite;
-    z-index: 1; opacity: 0.6;
-  }
-  @keyframes sweep {
-    0% { top: 0%; }
-    100% { top: 100%; }
-  }
   .wrap { max-width: 1160px; margin: 0 auto; position: relative; z-index: 2; }
   header { margin-bottom: 32px; }
-  .tag {
-    font-size: 0.72rem; letter-spacing: 0.35em; color: var(--cyan-dim);
-    text-transform: uppercase; margin-bottom: 10px;
-  }
-  h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2.1rem; font-weight: 900; margin: 0 0 8px;
-    letter-spacing: 0.03em;
-    color: var(--cyan);
-    text-shadow: 0 0 8px var(--cyan-glow), 0 0 24px rgba(53,230,255,0.25);
-  }
-  .sub { color: var(--muted); font-size: 0.9rem; }
   .hr {
     height: 1px; margin: 22px 0;
     background: linear-gradient(90deg, var(--cyan) 0%, transparent 60%);
@@ -170,12 +147,8 @@
 </style>
 </head>
 <body>
-<div class="scan"></div>
 <div class="wrap">
   <header>
-    <div class="tag">// SYSTEM ONLINE — PUBLIC INSTANCE</div>
-    <h1>FARM.OS ⟨ SITE INTELLIGENCE ⟩</h1>
-    <div class="sub">Live demo sites and outreach status. Contact details and pricing kept off this public page.</div>
     <div class="hr"></div>
   </header>
 
