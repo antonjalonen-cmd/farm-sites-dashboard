@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farm Sites Dashboard — Anton Jalonen</title>
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --ink: #2b2620;
+    --muted: #6b6558;
+    --border: #e4ded2;
+    --green: #3f6b4b;
+    --green-bg: #e8f0e9;
+    --amber: #a3701f;
+    --amber-bg: #f6ecd9;
+    --grey: #7a7568;
+    --grey-bg: #eeece5;
+    --blue: #2c5a8c;
+    --blue-bg: #e5edf5;
+    --accent: #a8382a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 40px 24px 80px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { margin-bottom: 32px; }
+  h1 { font-size: 1.9rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 0.95rem; }
+  .stats {
+    display: flex; gap: 12px; flex-wrap: wrap; margin: 24px 0 32px;
+  }
+  .stat {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 18px; min-width: 120px;
+  }
+  .stat .num { font-size: 1.5rem; font-weight: 700; }
+  .stat .label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .filters {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .filter-btn {
+    border: 1px solid var(--border); background: var(--card); color: var(--ink);
+    padding: 7px 14px; border-radius: 20px; font-size: 0.85rem; cursor: pointer;
+  }
+  .filter-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .card h2 { font-size: 1.08rem; margin: 0; line-height: 1.3; }
+  .badge {
+    font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+    white-space: nowrap; text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .badge.replied { background: var(--green-bg); color: var(--green); }
+  .badge.emailed { background: var(--amber-bg); color: var(--amber); }
+  .badge.deployed { background: var(--blue-bg); color: var(--blue); }
+  .badge.pending { background: var(--grey-bg); color: var(--grey); }
+  .links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .links a {
+    font-size: 0.82rem; text-decoration: none; padding: 5px 11px; border-radius: 7px;
+    border: 1px solid var(--border); color: var(--ink);
+  }
+  .links a.gh:hover { background: #1f2328; color: #fff; border-color: #1f2328; }
+  .links a.nf:hover { background: #00ad9f; color: #fff; border-color: #00ad9f; }
+  .meta { font-size: 0.83rem; color: var(--muted); line-height: 1.5; }
+  .meta strong { color: var(--ink); font-weight: 600; }
+  .note { font-size: 0.82rem; color: var(--muted); font-style: italic; border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 2px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 50px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🌾 Farm Sites Dashboard</h1>
+    <div class="sub">Every demo site, its live links, and outreach status — updated manually, open this file anytime.</div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>Personal tracker — contact details and pricing kept off this public page.</footer>
+</div>
+
+<script>
+const sites = [
+  { name: "Vaskivuorentila", folder: "vaskivuoren-tila", gh: "https://antonjalonen-cmd.github.io/vaskivuoren-tila/", nf: "https://vaskivuoren-tila.netlify.app", status: "replied", note: "Warm lead — replied, pricing discussion in progress." },
+  { name: "Rossihaan Lammastila", folder: "rossihaan-lammastila", gh: "https://antonjalonen-cmd.github.io/rossihaan-lammastila/", nf: "https://rossihaan-lammastila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
+  { name: "Lehtosen Marja- ja Vihannestila", folder: "lehtosen-marja-vihannestila", gh: "https://antonjalonen-cmd.github.io/lehtosen-marja-vihannestila/", nf: "https://lehtosen-marja-vihannestila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
+  { name: "Paivarinteen Maatila", folder: "paivarinne-maatila", gh: "https://antonjalonen-cmd.github.io/paivarinne-maatila/", nf: "https://paivarinteen-maatila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
+  { name: "Stromsbergin Mylly Oy", folder: "stromsbergin-mylly", gh: "https://antonjalonen-cmd.github.io/stromsbergin-mylly/", nf: "https://stromsbergin-mylly.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
+  { name: "Karhulan Tila", folder: null, gh: null, nf: "https://karhulan-tila.netlify.app", status: "emailed", note: "Done in an earlier session." },
+  { name: "Kukkaromäen Maatila", folder: null, gh: null, nf: "https://kukkaromaenmaatila.netlify.app", status: "emailed", note: "Done in an earlier session." },
+  { name: "Latva-Mantilan hunajatila", folder: "latva-mantilan-hunajatila", gh: "https://antonjalonen-cmd.github.io/latva-mantilan-hunajatila/", nf: null, status: "deployed", note: "No contact found yet." },
+  { name: "FinneFarm", folder: "finnefarm", gh: "https://antonjalonen-cmd.github.io/finnefarm/", nf: null, status: "deployed", note: "Outreach not sent yet." },
+  { name: "Karjalaisten Tila", folder: "karjalaisten-tila", gh: "https://antonjalonen-cmd.github.io/karjalaisten-tila/", nf: null, status: "deployed", note: "Outreach not sent yet." },
+  { name: "Koivuniemen Puutarha", folder: "koivuniemen-puutarha", gh: "https://antonjalonen-cmd.github.io/koivuniemen-puutarha/", nf: null, status: "deployed", note: "No contact found yet." },
+  { name: "Leponiemen Maatila", folder: "leponiemen-maatila", gh: "https://antonjalonen-cmd.github.io/leponiemen-maatila/", nf: null, status: "deployed", note: "No contact found yet." },
+  { name: "Puustijarven Marjatila", folder: "puustijarven-marjatila", gh: "https://antonjalonen-cmd.github.io/puustijarven-marjatila/", nf: null, status: "deployed", note: "Outreach not sent yet." },
+  { name: "Selinin Marjatila", folder: "selinin-marjatila", gh: "https://antonjalonen-cmd.github.io/selinin-marjatila/", nf: null, status: "deployed", note: "No contact found yet." },
+  { name: "Tiia-Marin Kukkamaa", folder: "tiia-marin-kukkamaa", gh: "https://antonjalonen-cmd.github.io/tiia-marin-kukkamaa/", nf: null, status: "deployed", note: "Outreach not sent yet." },
+  { name: "Vähätalon tila", folder: "vahatalon-tila", gh: "https://antonjalonen-cmd.github.io/vahatalon-tila/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Kangasniemen Tila", folder: "kangasniemen-tila", gh: "https://antonjalonen-cmd.github.io/kangasniemen-tila/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Kaskitaival Oy", folder: "kaskitaival-oy", gh: "https://antonjalonen-cmd.github.io/kaskitaival-oy/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Ojalan tila", folder: "ojalan-tila", gh: "https://antonjalonen-cmd.github.io/ojalan-tila/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Metsälän tila", folder: "metsalan-tila", gh: "https://antonjalonen-cmd.github.io/metsalan-tila/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+];
+
+const statusMeta = {
+  replied:  { label: "Replied",        cls: "replied"  },
+  emailed:  { label: "Emailed",        cls: "emailed"  },
+  deployed: { label: "Deployed only",  cls: "deployed" },
+  pending:  { label: "Not deployed",   cls: "pending"  },
+};
+
+function render(filter) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const list = filter === 'all' ? sites : sites.filter(s => s.status === filter);
+  list.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const sm = statusMeta[s.status];
+    card.innerHTML = `
+      <div class="card-top">
+        <h2>${s.name}</h2>
+        <span class="badge ${sm.cls}">${sm.label}</span>
+      </div>
+      <div class="links">
+        ${s.gh ? `<a class="gh" href="${s.gh}" target="_blank">GitHub Pages ↗</a>` : ''}
+        ${s.nf ? `<a class="nf" href="${s.nf}" target="_blank">Netlify ↗</a>` : ''}
+      </div>
+      ${s.note ? `<div class="note">${s.note}</div>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderStats() {
+  const counts = { all: sites.length, replied: 0, emailed: 0, deployed: 0, pending: 0 };
+  sites.forEach(s => counts[s.status]++);
+  const statsEl = document.getElementById('stats');
+  statsEl.innerHTML = `
+    <div class="stat"><div class="num">${counts.all}</div><div class="label">Total sites</div></div>
+    <div class="stat"><div class="num">${counts.replied}</div><div class="label">Replied</div></div>
+    <div class="stat"><div class="num">${counts.emailed}</div><div class="label">Emailed</div></div>
+    <div class="stat"><div class="num">${counts.deployed}</div><div class="label">Deployed, no email</div></div>
+  `;
+}
+
+function renderFilters() {
+  const filtersEl = document.getElementById('filters');
+  const opts = [['all','All'],['replied','Replied'],['emailed','Emailed'],['deployed','Deployed only']];
+  filtersEl.innerHTML = opts.map(([key,label], i) =>
+    `<button class="filter-btn${i===0?' active':''}" data-filter="${key}">${label}</button>`
+  ).join('');
+  filtersEl.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtersEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render(btn.dataset.filter);
+    });
+  });
+}
+
+renderStats();
+renderFilters();
+render('all');
+</script>
+</body>
+</html>
