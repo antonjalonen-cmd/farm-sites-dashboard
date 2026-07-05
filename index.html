@@ -74,6 +74,7 @@
   }
   .dot.replied { background: var(--green); }
   .dot.emailed { background: var(--amber); }
+  .dot.drafted { background: var(--cyan); }
   .dot.deployed { background: var(--blue); }
   .dot.pending { background: var(--grey); }
   .status-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
@@ -97,12 +98,12 @@
 // otherwise date-only from project records — never a fabricated exact time)
 const sites = [
   { name: "Rautamulta Highland", gh: "antonjalonen-cmd.github.io/rautamulta-highland", nf: null, status: "deployed", note: "From another session.", date: "2026-07-05", time: "05:51" },
-  { name: "Vähätalon tila", gh: "antonjalonen-cmd.github.io/vahatalon-tila", nf: null, status: "emailed", note: "Outreach sent.", date: "2026-07-05", time: "03:58" },
+  { name: "Vähätalon tila", gh: "antonjalonen-cmd.github.io/vahatalon-tila", nf: null, status: "drafted", note: "Outreach drafted, not sent yet.", date: "2026-07-05", time: "03:58" },
   { name: "Kangasniemen Tila", gh: "antonjalonen-cmd.github.io/kangasniemen-tila", nf: null, status: "deployed", note: "No outreach yet.", date: "2026-07-05", time: "04:01" },
-  { name: "Kaskitaival Oy", gh: "antonjalonen-cmd.github.io/kaskitaival-oy", nf: null, status: "emailed", note: "Outreach sent.", date: "2026-07-05", time: "04:01" },
-  { name: "Ojalan tila", gh: "antonjalonen-cmd.github.io/ojalan-tila", nf: null, status: "emailed", note: "Outreach sent. Photos still pending.", date: "2026-07-05", time: "04:01" },
-  { name: "Metsälän tila", gh: "antonjalonen-cmd.github.io/metsalan-tila", nf: null, status: "emailed", note: "Outreach sent.", date: "2026-07-05", time: "04:02" },
-  { name: "Viitaniemen Lammastila", gh: "antonjalonen-cmd.github.io/viitaniemen-lammastila", nf: null, status: "emailed", note: "Outreach sent.", date: "2026-07-05", time: "09:30" },
+  { name: "Kaskitaival Oy", gh: "antonjalonen-cmd.github.io/kaskitaival-oy", nf: null, status: "drafted", note: "Outreach drafted, not sent yet.", date: "2026-07-05", time: "04:01" },
+  { name: "Ojalan tila", gh: "antonjalonen-cmd.github.io/ojalan-tila", nf: null, status: "drafted", note: "Outreach drafted, not sent yet. Photos still pending.", date: "2026-07-05", time: "04:01" },
+  { name: "Metsälän tila", gh: "antonjalonen-cmd.github.io/metsalan-tila", nf: null, status: "drafted", note: "Outreach drafted, not sent yet.", date: "2026-07-05", time: "04:02" },
+  { name: "Viitaniemen Lammastila", gh: "antonjalonen-cmd.github.io/viitaniemen-lammastila", nf: null, status: "drafted", note: "Outreach drafted, not sent yet.", date: "2026-07-05", time: "09:30" },
 
   { name: "Karhulan Tila", gh: null, nf: "karhulan-tila.netlify.app", status: "emailed", note: "Done in an earlier session.", date: "2026-07-04", time: "07:24" },
   { name: "Lehtosen Marja- ja Vihannestila", gh: "antonjalonen-cmd.github.io/lehtosen-marja-vihannestila", nf: "lehtosen-marja-vihannestila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet.", date: "2026-07-04", time: "03:18" },
@@ -125,6 +126,7 @@ const sites = [
 const statusMeta = {
   replied:  { label: "Replied" },
   emailed:  { label: "Emailed" },
+  drafted:  { label: "Drafted" },
   deployed: { label: "Deployed" },
   pending:  { label: "Not deployed" },
 };
@@ -186,13 +188,14 @@ function render(filter) {
 }
 
 function renderStats() {
-  const counts = { all: sites.length, replied: 0, emailed: 0, deployed: 0, pending: 0 };
+  const counts = { all: sites.length, replied: 0, emailed: 0, drafted: 0, deployed: 0, pending: 0 };
   sites.forEach(s => counts[s.status]++);
   const statsEl = document.getElementById('stats');
   statsEl.innerHTML = `
     <div class="stat"><span class="num">${counts.all}</span> <span class="label">total</span></div>
     <div class="stat"><span class="num">${counts.replied}</span> <span class="label">replied</span></div>
     <div class="stat"><span class="num">${counts.emailed}</span> <span class="label">emailed</span></div>
+    <div class="stat"><span class="num">${counts.drafted}</span> <span class="label">drafted, not sent</span></div>
     <div class="stat"><span class="num">${counts.deployed}</span> <span class="label">deployed, no email</span></div>
   `;
 }
