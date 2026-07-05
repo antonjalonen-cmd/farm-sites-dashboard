@@ -6,212 +6,123 @@
 <title>FARM.OS — Site Intelligence Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #050b14;
-    --panel: rgba(12, 24, 38, 0.7);
-    --panel-solid: #0b1a29;
-    --grid-line: rgba(56, 189, 248, 0.07);
     --cyan: #35e6ff;
     --cyan-dim: #1b7f96;
-    --cyan-glow: rgba(53, 230, 255, 0.55);
     --ink: #d8f4ff;
     --muted: #6f93a8;
-    --border: rgba(53, 230, 255, 0.25);
+    --border: rgba(53, 230, 255, 0.15);
     --green: #48ffb0;
-    --green-glow: rgba(72, 255, 176, 0.5);
     --amber: #ffcb47;
-    --amber-glow: rgba(255, 203, 71, 0.5);
     --blue: #4da8ff;
-    --blue-glow: rgba(77, 168, 255, 0.5);
     --grey: #7d95a3;
   }
   * { box-sizing: border-box; }
-  html, body { height: 100%; }
   body {
     margin: 0;
     font-family: 'Share Tech Mono', monospace;
     background: var(--bg);
     color: var(--ink);
-    padding: 40px 24px 80px;
-    position: relative;
-    overflow-x: hidden;
+    padding: 32px 20px 60px;
   }
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(var(--grid-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-    background-size: 42px 42px;
-    pointer-events: none;
-    z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
-    width: 1200px; height: 700px;
-    background: radial-gradient(ellipse at center, rgba(53,230,255,0.10) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .wrap { max-width: 1160px; margin: 0 auto; position: relative; z-index: 2; }
-  header { margin-bottom: 32px; }
-  .hr {
-    height: 1px; margin: 22px 0;
-    background: linear-gradient(90deg, var(--cyan) 0%, transparent 60%);
-    opacity: 0.5;
-  }
+  .wrap { max-width: 760px; margin: 0 auto; }
   .stats {
-    display: flex; gap: 14px; flex-wrap: wrap; margin: 24px 0 32px;
+    display: flex; gap: 22px; flex-wrap: wrap; margin-bottom: 24px;
+    padding-bottom: 20px; border-bottom: 1px solid var(--border);
   }
-  .stat {
-    background: var(--panel); backdrop-filter: blur(6px);
-    border: 1px solid var(--border); border-radius: 4px;
-    padding: 14px 20px; min-width: 140px; position: relative;
-    box-shadow: inset 0 0 20px rgba(53,230,255,0.04);
-  }
-  .stat::before, .stat::after {
-    content: ''; position: absolute; width: 10px; height: 10px;
-    border: 1px solid var(--cyan); opacity: 0.8;
-  }
-  .stat::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
-  .stat::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
-  .stat .num {
-    font-family: 'Orbitron', sans-serif; font-size: 1.7rem; font-weight: 700;
-    color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow);
-  }
-  .stat .label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
-  .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat .num { font-size: 1.3rem; font-weight: 700; color: var(--cyan); }
+  .stat .label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; }
   .filter-btn {
     border: 1px solid var(--border); background: transparent; color: var(--cyan-dim);
-    padding: 8px 16px; font-size: 0.78rem; cursor: pointer;
-    font-family: 'Share Tech Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;
-    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-    transition: all 0.15s ease;
+    padding: 5px 12px; font-size: 0.72rem; cursor: pointer;
+    font-family: 'Share Tech Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase;
+    border-radius: 3px;
   }
   .filter-btn:hover { color: var(--cyan); border-color: var(--cyan); }
-  .filter-btn.active {
-    background: rgba(53,230,255,0.12); color: var(--cyan); border-color: var(--cyan);
-    box-shadow: 0 0 14px rgba(53,230,255,0.25);
+  .filter-btn.active { background: rgba(53,230,255,0.12); color: var(--cyan); border-color: var(--cyan); }
+  .row {
+    display: flex; align-items: baseline; flex-wrap: wrap;
+    gap: 4px 10px; padding: 10px 0; border-bottom: 1px solid var(--border);
   }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 18px; }
-  .card {
-    background: var(--panel); backdrop-filter: blur(6px);
-    border: 1px solid var(--border); border-radius: 4px;
-    padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;
-    position: relative; transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  .row-name { font-weight: 700; font-size: 0.9rem; color: var(--ink); }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    display: inline-block; margin-right: 2px;
   }
-  .card:hover { border-color: var(--cyan); box-shadow: 0 0 24px rgba(53,230,255,0.15); }
-  .card::before, .card::after {
-    content: ''; position: absolute; width: 12px; height: 12px;
-    border: 1px solid var(--cyan); opacity: 0.7;
-  }
-  .card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
-  .card::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
-  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-  .card h2 {
-    font-family: 'Orbitron', sans-serif; font-size: 0.95rem; margin: 0; line-height: 1.4;
-    color: var(--ink); letter-spacing: 0.01em; font-weight: 700;
-  }
-  .badge {
-    font-size: 0.66rem; font-weight: 700; padding: 4px 10px; border-radius: 2px;
-    white-space: nowrap; text-transform: uppercase; letter-spacing: 0.06em;
-    border: 1px solid; flex-shrink: 0;
-  }
-  .badge.replied { color: var(--green); border-color: var(--green); box-shadow: 0 0 10px var(--green-glow); animation: pulse 2s ease-in-out infinite; }
-  .badge.emailed { color: var(--amber); border-color: var(--amber); box-shadow: 0 0 8px var(--amber-glow); }
-  .badge.deployed { color: var(--blue); border-color: var(--blue); box-shadow: 0 0 8px var(--blue-glow); }
-  .badge.pending { color: var(--grey); border-color: var(--grey); }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.55; }
-  }
-  .links { display: flex; gap: 8px; flex-wrap: wrap; }
-  .links a {
-    font-size: 0.76rem; text-decoration: none; padding: 6px 12px;
-    border: 1px solid var(--border); color: var(--cyan-dim);
-    letter-spacing: 0.03em;
-  }
-  .links a.gh:hover { background: var(--cyan); color: #01131a; border-color: var(--cyan); }
-  .links a.nf:hover { background: #00e0c6; color: #01131a; border-color: #00e0c6; }
-  .note {
-    font-size: 0.78rem; color: var(--muted); line-height: 1.5;
-    border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 2px;
-  }
-  footer {
-    text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 60px;
-    letter-spacing: 0.05em;
-  }
+  .dot.replied { background: var(--green); }
+  .dot.emailed { background: var(--amber); }
+  .dot.deployed { background: var(--blue); }
+  .dot.pending { background: var(--grey); }
+  .status-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .row-links { display: flex; gap: 12px; margin-left: auto; font-size: 0.78rem; }
+  .row-links a { color: var(--cyan-dim); text-decoration: none; }
+  .row-links a:hover { color: var(--cyan); text-decoration: underline; }
+  .row-note { width: 100%; font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.7rem; margin-top: 40px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="hr"></div>
-  </header>
-
   <div class="stats" id="stats"></div>
-
   <div class="filters" id="filters"></div>
-
-  <div class="grid" id="grid"></div>
-
-  <footer>PERSONAL TRACKER — SANITIZED PUBLIC VIEW</footer>
+  <div id="list"></div>
+  <footer>Personal tracker — sanitized public view</footer>
 </div>
 
 <script>
 const sites = [
-  { name: "Vaskivuorentila", folder: "vaskivuoren-tila", gh: "https://antonjalonen-cmd.github.io/vaskivuoren-tila/", nf: "https://vaskivuoren-tila.netlify.app", status: "replied", note: "Warm lead — pricing discussion in progress, waiting on their reply." },
-  { name: "Rossihaan Lammastila", folder: "rossihaan-lammastila", gh: "https://antonjalonen-cmd.github.io/rossihaan-lammastila/", nf: "https://rossihaan-lammastila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
-  { name: "Lehtosen Marja- ja Vihannestila", folder: "lehtosen-marja-vihannestila", gh: "https://antonjalonen-cmd.github.io/lehtosen-marja-vihannestila/", nf: "https://lehtosen-marja-vihannestila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
-  { name: "Paivarinteen Maatila", folder: "paivarinne-maatila", gh: "https://antonjalonen-cmd.github.io/paivarinne-maatila/", nf: "https://paivarinteen-maatila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
-  { name: "Stromsbergin Mylly Oy", folder: "stromsbergin-mylly", gh: "https://antonjalonen-cmd.github.io/stromsbergin-mylly/", nf: "https://stromsbergin-mylly.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
-  { name: "Karhulan Tila", folder: null, gh: null, nf: "https://karhulan-tila.netlify.app", status: "emailed", note: "Done in an earlier session." },
-  { name: "Kukkaromäen Maatila", folder: null, gh: null, nf: "https://kukkaromaenmaatila.netlify.app", status: "emailed", note: "Done in an earlier session." },
-  { name: "Latva-Mantilan hunajatila", folder: "latva-mantilan-hunajatila", gh: "https://antonjalonen-cmd.github.io/latva-mantilan-hunajatila/", nf: null, status: "deployed", note: "No contact found yet." },
-  { name: "FinneFarm", folder: "finnefarm", gh: "https://antonjalonen-cmd.github.io/finnefarm/", nf: null, status: "deployed", note: "Outreach not sent yet." },
-  { name: "Karjalaisten Tila", folder: "karjalaisten-tila", gh: "https://antonjalonen-cmd.github.io/karjalaisten-tila/", nf: null, status: "deployed", note: "Outreach not sent yet." },
-  { name: "Koivuniemen Puutarha", folder: "koivuniemen-puutarha", gh: "https://antonjalonen-cmd.github.io/koivuniemen-puutarha/", nf: null, status: "deployed", note: "No contact found yet." },
-  { name: "Leponiemen Maatila", folder: "leponiemen-maatila", gh: "https://antonjalonen-cmd.github.io/leponiemen-maatila/", nf: null, status: "deployed", note: "No contact found yet." },
-  { name: "Puustijarven Marjatila", folder: "puustijarven-marjatila", gh: "https://antonjalonen-cmd.github.io/puustijarven-marjatila/", nf: null, status: "deployed", note: "Outreach not sent yet." },
-  { name: "Selinin Marjatila", folder: "selinin-marjatila", gh: "https://antonjalonen-cmd.github.io/selinin-marjatila/", nf: null, status: "deployed", note: "No contact found yet." },
-  { name: "Tiia-Marin Kukkamaa", folder: "tiia-marin-kukkamaa", gh: "https://antonjalonen-cmd.github.io/tiia-marin-kukkamaa/", nf: null, status: "deployed", note: "Outreach not sent yet." },
-  { name: "Vähätalon tila", folder: "vahatalon-tila", gh: "https://antonjalonen-cmd.github.io/vahatalon-tila/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
-  { name: "Kangasniemen Tila", folder: "kangasniemen-tila", gh: "https://antonjalonen-cmd.github.io/kangasniemen-tila/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
-  { name: "Kaskitaival Oy", folder: "kaskitaival-oy", gh: "https://antonjalonen-cmd.github.io/kaskitaival-oy/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
-  { name: "Ojalan tila", folder: "ojalan-tila", gh: "https://antonjalonen-cmd.github.io/ojalan-tila/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
-  { name: "Metsälän tila", folder: "metsalan-tila", gh: "https://antonjalonen-cmd.github.io/metsalan-tila/", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Vaskivuorentila", gh: "antonjalonen-cmd.github.io/vaskivuoren-tila", nf: "vaskivuoren-tila.netlify.app", status: "replied", note: "Warm lead — pricing discussion in progress, waiting on their reply." },
+  { name: "Rossihaan Lammastila", gh: "antonjalonen-cmd.github.io/rossihaan-lammastila", nf: "rossihaan-lammastila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
+  { name: "Lehtosen Marja- ja Vihannestila", gh: "antonjalonen-cmd.github.io/lehtosen-marja-vihannestila", nf: "lehtosen-marja-vihannestila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
+  { name: "Paivarinteen Maatila", gh: "antonjalonen-cmd.github.io/paivarinne-maatila", nf: "paivarinteen-maatila.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
+  { name: "Stromsbergin Mylly Oy", gh: "antonjalonen-cmd.github.io/stromsbergin-mylly", nf: "stromsbergin-mylly.netlify.app", status: "emailed", note: "Outreach sent, no reply yet." },
+  { name: "Karhulan Tila", gh: null, nf: "karhulan-tila.netlify.app", status: "emailed", note: "Done in an earlier session." },
+  { name: "Kukkaromäen Maatila", gh: null, nf: "kukkaromaenmaatila.netlify.app", status: "emailed", note: "Done in an earlier session." },
+  { name: "Latva-Mantilan hunajatila", gh: "antonjalonen-cmd.github.io/latva-mantilan-hunajatila", nf: null, status: "deployed", note: "No contact found yet." },
+  { name: "FinneFarm", gh: "antonjalonen-cmd.github.io/finnefarm", nf: null, status: "deployed", note: "Outreach not sent yet." },
+  { name: "Karjalaisten Tila", gh: "antonjalonen-cmd.github.io/karjalaisten-tila", nf: null, status: "deployed", note: "Outreach not sent yet." },
+  { name: "Koivuniemen Puutarha", gh: "antonjalonen-cmd.github.io/koivuniemen-puutarha", nf: null, status: "deployed", note: "No contact found yet." },
+  { name: "Leponiemen Maatila", gh: "antonjalonen-cmd.github.io/leponiemen-maatila", nf: null, status: "deployed", note: "No contact found yet." },
+  { name: "Puustijarven Marjatila", gh: "antonjalonen-cmd.github.io/puustijarven-marjatila", nf: null, status: "deployed", note: "Outreach not sent yet." },
+  { name: "Selinin Marjatila", gh: "antonjalonen-cmd.github.io/selinin-marjatila", nf: null, status: "deployed", note: "No contact found yet." },
+  { name: "Tiia-Marin Kukkamaa", gh: "antonjalonen-cmd.github.io/tiia-marin-kukkamaa", nf: null, status: "deployed", note: "Outreach not sent yet." },
+  { name: "Vähätalon tila", gh: "antonjalonen-cmd.github.io/vahatalon-tila", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Kangasniemen Tila", gh: "antonjalonen-cmd.github.io/kangasniemen-tila", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Kaskitaival Oy", gh: "antonjalonen-cmd.github.io/kaskitaival-oy", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Ojalan tila", gh: "antonjalonen-cmd.github.io/ojalan-tila", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
+  { name: "Metsälän tila", gh: "antonjalonen-cmd.github.io/metsalan-tila", nf: null, status: "deployed", note: "Built 2026-07-05, no outreach yet." },
 ];
 
 const statusMeta = {
-  replied:  { label: "Replied",        cls: "replied"  },
-  emailed:  { label: "Emailed",        cls: "emailed"  },
-  deployed: { label: "Deployed only",  cls: "deployed" },
-  pending:  { label: "Not deployed",   cls: "pending"  },
+  replied:  { label: "Replied" },
+  emailed:  { label: "Emailed" },
+  deployed: { label: "Deployed" },
+  pending:  { label: "Not deployed" },
 };
 
 function render(filter) {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
+  const listEl = document.getElementById('list');
+  listEl.innerHTML = '';
   const list = filter === 'all' ? sites : sites.filter(s => s.status === filter);
   list.forEach(s => {
-    const card = document.createElement('div');
-    card.className = 'card';
     const sm = statusMeta[s.status];
-    card.innerHTML = `
-      <div class="card-top">
-        <h2>${s.name}</h2>
-        <span class="badge ${sm.cls}">${sm.label}</span>
-      </div>
-      <div class="links">
-        ${s.gh ? `<a class="gh" href="${s.gh}" target="_blank">GITHUB ↗</a>` : ''}
-        ${s.nf ? `<a class="nf" href="${s.nf}" target="_blank">NETLIFY ↗</a>` : ''}
-      </div>
-      ${s.note ? `<div class="note">${s.note}</div>` : ''}
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <span class="dot ${s.status}"></span>
+      <span class="row-name">${s.name}</span>
+      <span class="status-label">${sm.label}</span>
+      <span class="row-links">
+        ${s.gh ? `<a href="https://${s.gh}/" target="_blank">${s.gh}</a>` : ''}
+        ${s.nf ? `<a href="https://${s.nf}/" target="_blank">${s.nf}</a>` : ''}
+      </span>
+      ${s.note ? `<span class="row-note">${s.note}</span>` : ''}
     `;
-    grid.appendChild(card);
+    listEl.appendChild(row);
   });
 }
 
@@ -220,16 +131,16 @@ function renderStats() {
   sites.forEach(s => counts[s.status]++);
   const statsEl = document.getElementById('stats');
   statsEl.innerHTML = `
-    <div class="stat"><div class="num">${counts.all}</div><div class="label">Total Sites</div></div>
-    <div class="stat"><div class="num">${counts.replied}</div><div class="label">Replied</div></div>
-    <div class="stat"><div class="num">${counts.emailed}</div><div class="label">Emailed</div></div>
-    <div class="stat"><div class="num">${counts.deployed}</div><div class="label">Deployed, No Email</div></div>
+    <div class="stat"><span class="num">${counts.all}</span> <span class="label">total</span></div>
+    <div class="stat"><span class="num">${counts.replied}</span> <span class="label">replied</span></div>
+    <div class="stat"><span class="num">${counts.emailed}</span> <span class="label">emailed</span></div>
+    <div class="stat"><span class="num">${counts.deployed}</span> <span class="label">deployed, no email</span></div>
   `;
 }
 
 function renderFilters() {
   const filtersEl = document.getElementById('filters');
-  const opts = [['all','All'],['replied','Replied'],['emailed','Emailed'],['deployed','Deployed Only']];
+  const opts = [['all','All'],['replied','Replied'],['emailed','Emailed'],['deployed','Deployed']];
   filtersEl.innerHTML = opts.map(([key,label], i) =>
     `<button class="filter-btn${i===0?' active':''}" data-filter="${key}">${label}</button>`
   ).join('');
