@@ -3,86 +3,180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Farm Sites Dashboard — Anton Jalonen</title>
+<title>FARM.OS — Site Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f6f4ef;
-    --card: #ffffff;
-    --ink: #2b2620;
-    --muted: #6b6558;
-    --border: #e4ded2;
-    --green: #3f6b4b;
-    --green-bg: #e8f0e9;
-    --amber: #a3701f;
-    --amber-bg: #f6ecd9;
-    --grey: #7a7568;
-    --grey-bg: #eeece5;
-    --blue: #2c5a8c;
-    --blue-bg: #e5edf5;
-    --accent: #a8382a;
+    --bg: #050b14;
+    --panel: rgba(12, 24, 38, 0.7);
+    --panel-solid: #0b1a29;
+    --grid-line: rgba(56, 189, 248, 0.07);
+    --cyan: #35e6ff;
+    --cyan-dim: #1b7f96;
+    --cyan-glow: rgba(53, 230, 255, 0.55);
+    --ink: #d8f4ff;
+    --muted: #6f93a8;
+    --border: rgba(53, 230, 255, 0.25);
+    --green: #48ffb0;
+    --green-glow: rgba(72, 255, 176, 0.5);
+    --amber: #ffcb47;
+    --amber-glow: rgba(255, 203, 71, 0.5);
+    --blue: #4da8ff;
+    --blue-glow: rgba(77, 168, 255, 0.5);
+    --grey: #7d95a3;
   }
   * { box-sizing: border-box; }
+  html, body { height: 100%; }
   body {
     margin: 0;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Share Tech Mono', monospace;
     background: var(--bg);
     color: var(--ink);
     padding: 40px 24px 80px;
+    position: relative;
+    overflow-x: hidden;
   }
-  .wrap { max-width: 1100px; margin: 0 auto; }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
+    width: 1200px; height: 700px;
+    background: radial-gradient(ellipse at center, rgba(53,230,255,0.10) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .scan {
+    position: fixed; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan-glow), transparent);
+    box-shadow: 0 0 12px 2px var(--cyan-glow);
+    animation: sweep 6s linear infinite;
+    z-index: 1; opacity: 0.6;
+  }
+  @keyframes sweep {
+    0% { top: 0%; }
+    100% { top: 100%; }
+  }
+  .wrap { max-width: 1160px; margin: 0 auto; position: relative; z-index: 2; }
   header { margin-bottom: 32px; }
-  h1 { font-size: 1.9rem; margin: 0 0 6px; letter-spacing: -0.01em; }
-  .sub { color: var(--muted); font-size: 0.95rem; }
+  .tag {
+    font-size: 0.72rem; letter-spacing: 0.35em; color: var(--cyan-dim);
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.1rem; font-weight: 900; margin: 0 0 8px;
+    letter-spacing: 0.03em;
+    color: var(--cyan);
+    text-shadow: 0 0 8px var(--cyan-glow), 0 0 24px rgba(53,230,255,0.25);
+  }
+  .sub { color: var(--muted); font-size: 0.9rem; }
+  .hr {
+    height: 1px; margin: 22px 0;
+    background: linear-gradient(90deg, var(--cyan) 0%, transparent 60%);
+    opacity: 0.5;
+  }
   .stats {
-    display: flex; gap: 12px; flex-wrap: wrap; margin: 24px 0 32px;
+    display: flex; gap: 14px; flex-wrap: wrap; margin: 24px 0 32px;
   }
   .stat {
-    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-    padding: 12px 18px; min-width: 120px;
+    background: var(--panel); backdrop-filter: blur(6px);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 14px 20px; min-width: 140px; position: relative;
+    box-shadow: inset 0 0 20px rgba(53,230,255,0.04);
   }
-  .stat .num { font-size: 1.5rem; font-weight: 700; }
-  .stat .label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-  .filters {
-    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+  .stat::before, .stat::after {
+    content: ''; position: absolute; width: 10px; height: 10px;
+    border: 1px solid var(--cyan); opacity: 0.8;
   }
+  .stat::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .stat::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .stat .num {
+    font-family: 'Orbitron', sans-serif; font-size: 1.7rem; font-weight: 700;
+    color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow);
+  }
+  .stat .label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
   .filter-btn {
-    border: 1px solid var(--border); background: var(--card); color: var(--ink);
-    padding: 7px 14px; border-radius: 20px; font-size: 0.85rem; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--cyan-dim);
+    padding: 8px 16px; font-size: 0.78rem; cursor: pointer;
+    font-family: 'Share Tech Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    transition: all 0.15s ease;
   }
-  .filter-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .filter-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+  .filter-btn.active {
+    background: rgba(53,230,255,0.12); color: var(--cyan); border-color: var(--cyan);
+    box-shadow: 0 0 14px rgba(53,230,255,0.25);
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 18px; }
   .card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+    background: var(--panel); backdrop-filter: blur(6px);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;
+    position: relative; transition: box-shadow 0.2s ease, border-color 0.2s ease;
   }
-  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-  .card h2 { font-size: 1.08rem; margin: 0; line-height: 1.3; }
+  .card:hover { border-color: var(--cyan); box-shadow: 0 0 24px rgba(53,230,255,0.15); }
+  .card::before, .card::after {
+    content: ''; position: absolute; width: 12px; height: 12px;
+    border: 1px solid var(--cyan); opacity: 0.7;
+  }
+  .card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .card::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .card h2 {
+    font-family: 'Orbitron', sans-serif; font-size: 0.95rem; margin: 0; line-height: 1.4;
+    color: var(--ink); letter-spacing: 0.01em; font-weight: 700;
+  }
   .badge {
-    font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px;
-    white-space: nowrap; text-transform: uppercase; letter-spacing: 0.03em;
+    font-size: 0.66rem; font-weight: 700; padding: 4px 10px; border-radius: 2px;
+    white-space: nowrap; text-transform: uppercase; letter-spacing: 0.06em;
+    border: 1px solid; flex-shrink: 0;
   }
-  .badge.replied { background: var(--green-bg); color: var(--green); }
-  .badge.emailed { background: var(--amber-bg); color: var(--amber); }
-  .badge.deployed { background: var(--blue-bg); color: var(--blue); }
-  .badge.pending { background: var(--grey-bg); color: var(--grey); }
+  .badge.replied { color: var(--green); border-color: var(--green); box-shadow: 0 0 10px var(--green-glow); animation: pulse 2s ease-in-out infinite; }
+  .badge.emailed { color: var(--amber); border-color: var(--amber); box-shadow: 0 0 8px var(--amber-glow); }
+  .badge.deployed { color: var(--blue); border-color: var(--blue); box-shadow: 0 0 8px var(--blue-glow); }
+  .badge.pending { color: var(--grey); border-color: var(--grey); }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
   .links { display: flex; gap: 8px; flex-wrap: wrap; }
   .links a {
-    font-size: 0.82rem; text-decoration: none; padding: 5px 11px; border-radius: 7px;
-    border: 1px solid var(--border); color: var(--ink);
+    font-size: 0.76rem; text-decoration: none; padding: 6px 12px;
+    border: 1px solid var(--border); color: var(--cyan-dim);
+    letter-spacing: 0.03em;
   }
-  .links a.gh:hover { background: #1f2328; color: #fff; border-color: #1f2328; }
-  .links a.nf:hover { background: #00ad9f; color: #fff; border-color: #00ad9f; }
-  .meta { font-size: 0.83rem; color: var(--muted); line-height: 1.5; }
-  .meta strong { color: var(--ink); font-weight: 600; }
-  .note { font-size: 0.82rem; color: var(--muted); font-style: italic; border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 2px; }
-  footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 50px; }
+  .links a.gh:hover { background: var(--cyan); color: #01131a; border-color: var(--cyan); }
+  .links a.nf:hover { background: #00e0c6; color: #01131a; border-color: #00e0c6; }
+  .note {
+    font-size: 0.78rem; color: var(--muted); line-height: 1.5;
+    border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 2px;
+  }
+  footer {
+    text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 60px;
+    letter-spacing: 0.05em;
+  }
 </style>
 </head>
 <body>
+<div class="scan"></div>
 <div class="wrap">
   <header>
-    <h1>🌾 Farm Sites Dashboard</h1>
-    <div class="sub">Every demo site, its live links, and outreach status — updated manually, open this file anytime.</div>
+    <div class="tag">// SYSTEM ONLINE — PUBLIC INSTANCE</div>
+    <h1>FARM.OS ⟨ SITE INTELLIGENCE ⟩</h1>
+    <div class="sub">Live demo sites and outreach status. Contact details and pricing kept off this public page.</div>
+    <div class="hr"></div>
   </header>
 
   <div class="stats" id="stats"></div>
@@ -91,7 +185,7 @@
 
   <div class="grid" id="grid"></div>
 
-  <footer>Personal tracker — contact details and pricing kept off this public page.</footer>
+  <footer>PERSONAL TRACKER — SANITIZED PUBLIC VIEW</footer>
 </div>
 
 <script>
@@ -139,8 +233,8 @@ function render(filter) {
         <span class="badge ${sm.cls}">${sm.label}</span>
       </div>
       <div class="links">
-        ${s.gh ? `<a class="gh" href="${s.gh}" target="_blank">GitHub Pages ↗</a>` : ''}
-        ${s.nf ? `<a class="nf" href="${s.nf}" target="_blank">Netlify ↗</a>` : ''}
+        ${s.gh ? `<a class="gh" href="${s.gh}" target="_blank">GITHUB ↗</a>` : ''}
+        ${s.nf ? `<a class="nf" href="${s.nf}" target="_blank">NETLIFY ↗</a>` : ''}
       </div>
       ${s.note ? `<div class="note">${s.note}</div>` : ''}
     `;
@@ -153,16 +247,16 @@ function renderStats() {
   sites.forEach(s => counts[s.status]++);
   const statsEl = document.getElementById('stats');
   statsEl.innerHTML = `
-    <div class="stat"><div class="num">${counts.all}</div><div class="label">Total sites</div></div>
+    <div class="stat"><div class="num">${counts.all}</div><div class="label">Total Sites</div></div>
     <div class="stat"><div class="num">${counts.replied}</div><div class="label">Replied</div></div>
     <div class="stat"><div class="num">${counts.emailed}</div><div class="label">Emailed</div></div>
-    <div class="stat"><div class="num">${counts.deployed}</div><div class="label">Deployed, no email</div></div>
+    <div class="stat"><div class="num">${counts.deployed}</div><div class="label">Deployed, No Email</div></div>
   `;
 }
 
 function renderFilters() {
   const filtersEl = document.getElementById('filters');
-  const opts = [['all','All'],['replied','Replied'],['emailed','Emailed'],['deployed','Deployed only']];
+  const opts = [['all','All'],['replied','Replied'],['emailed','Emailed'],['deployed','Deployed Only']];
   filtersEl.innerHTML = opts.map(([key,label], i) =>
     `<button class="filter-btn${i===0?' active':''}" data-filter="${key}">${label}</button>`
   ).join('');
