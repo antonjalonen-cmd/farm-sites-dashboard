@@ -233,7 +233,12 @@ function render(filter) {
 
     entries.forEach(s => {
       const sm = statusMeta[s.status];
-      const primaryUrl = s.gh ? `https://${s.gh}/` : (s.nf ? `https://${s.nf}/` : null);
+      function normUrl(raw) {
+        if (!raw) return null;
+        const url = raw.startsWith('http') ? raw : `https://${raw}`;
+        return url.endsWith('/') ? url : url + '/';
+      }
+      const primaryUrl = normUrl(s.gh) || normUrl(s.nf);
       const nameHtml = primaryUrl
         ? `<a class="row-name" href="${primaryUrl}" target="_blank">${s.name}</a>`
         : `<span class="row-name">${s.name}</span>`;
@@ -245,10 +250,9 @@ function render(filter) {
         ${nameHtml}
         <span class="status-label">${sm.label}</span>
         <span class="row-links">
-          ${s.gh ? `<a href="https://${s.gh}/" target="_blank">${s.gh}</a>` : ''}
-          ${s.nf ? `<a href="https://${s.nf}/" target="_blank">${s.nf}</a>` : ''}
+          ${s.gh ? `<a href="${normUrl(s.gh)}" target="_blank">${normUrl(s.gh)}</a>` : ''}
+          ${s.nf ? `<a href="${normUrl(s.nf)}" target="_blank">${normUrl(s.nf)}</a>` : ''}
         </span>
-        ${s.note ? `<span class="row-note">${s.note}</span>` : ''}
       `;
       details.appendChild(row);
     });
